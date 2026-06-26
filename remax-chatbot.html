@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RE/MAX — Qualifiez votre projet immobilier</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #D32F2F;
+    --red-dark: #B71C1C;
+    --red-light: #FFEBEE;
+    --gold: #FFB300;
+    --slate: #37474F;
+    --slate-light: #546E7A;
+    --bg: #F5F5F5;
+    --white: #FAFAFA;
+    --border: #E0E0E0;
+    --bubble-bot: #FFFFFF;
+    --bubble-user: #D32F2F;
+    --text: #212121;
+    --text-muted: #757575;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  /* WIDGET CONTAINER */
+  .chat-widget {
+    width: 100%;
+    max-width: 480px;
+    background: var(--white);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 4px 16px rgba(211,47,47,0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 680px;
+  }
+
+  /* HEADER */
+  .chat-header {
+    background: linear-gradient(135deg, var(--red-dark) 0%, var(--red) 100%);
+    padding: 20px 24px 16px;
+    flex-shrink: 0;
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  .bot-avatar {
+    width: 48px;
+    height: 48px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    animation: pulse-avatar 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse-avatar {
+    0%, 100% { box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+    50% { box-shadow: 0 2px 16px rgba(255,179,0,0.6); }
+  }
+
+  .header-info { flex: 1; }
+
+  .header-name {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: white;
+    letter-spacing: -0.3px;
+  }
+
+  .header-status {
+    font-size: 12px;
+    color: rgba(255,255,255,0.8);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 2px;
+  }
+
+  .status-dot {
+    width: 7px; height: 7px;
+    background: #69F0AE;
+    border-radius: 50%;
+    animation: blink 2s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .remax-badge {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--red);
+    background: white;
+    padding: 3px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+  }
+
+  /* PROGRESS BAR */
+  .progress-bar-wrap {
+    background: rgba(255,255,255,0.2);
+    border-radius: 4px;
+    height: 4px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--gold);
+    border-radius: 4px;
+    transition: width 0.6s ease;
+    width: 0%;
+  }
+
+  .progress-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.75);
+    margin-top: 6px;
+    text-align: right;
+  }
+
+  /* CHAT MESSAGES */
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    scroll-behavior: smooth;
+  }
+
+  .chat-messages::-webkit-scrollbar { width: 4px; }
+  .chat-messages::-webkit-scrollbar-track { background: transparent; }
+  .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* BUBBLES */
+  .msg-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    animation: fadeSlideIn 0.35s ease forwards;
+    opacity: 0;
+  }
+
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .msg-row.bot { justify-content: flex-start; }
+  .msg-row.user { justify-content: flex-end; }
+
+  .msg-avatar-sm {
+    width: 30px; height: 30px;
+    background: var(--red-light);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .bubble {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .bubble.bot {
+    background: var(--bubble-bot);
+    color: var(--text);
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border: 1px solid var(--border);
+  }
+
+  .bubble.user {
+    background: var(--bubble-user);
+    color: white;
+    border-bottom-right-radius: 4px;
+    font-weight: 500;
+  }
+
+  /* TYPING INDICATOR */
+  .typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 16px;
+    background: var(--bubble-bot);
+    border-radius: 18px;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border: 1px solid var(--border);
+    width: fit-content;
+  }
+
+  .typing-dot {
+    width: 7px; height: 7px;
+    background: var(--text-muted);
+    border-radius: 50%;
+    animation: typing 1.2s ease-in-out infinite;
+  }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes typing {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+    30% { transform: translateY(-6px); opacity: 1; }
+  }
+
+  /* OPTIONS BUTTONS */
+  .options-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+    padding: 0 38px;
+  }
+
+  .option-btn {
+    background: white;
+    border: 1.5px solid var(--red);
+    color: var(--red);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    animation: fadeSlideIn 0.4s ease forwards;
+    opacity: 0;
+  }
+
+  .option-btn:hover {
+    background: var(--red);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(211,47,47,0.3);
+  }
+
+  /* INPUT AREA */
+  .chat-input-area {
+    padding: 16px;
+    border-top: 1px solid var(--border);
+    background: white;
+    flex-shrink: 0;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .chat-input {
+    flex: 1;
+    border: 1.5px solid var(--border);
+    border-radius: 24px;
+    padding: 11px 18px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+    background: var(--bg);
+  }
+
+  .chat-input:focus { border-color: var(--red); background: white; }
+  .chat-input::placeholder { color: var(--text-muted); }
+  .chat-input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .send-btn {
+    width: 44px; height: 44px;
+    background: var(--red);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .send-btn:hover { background: var(--red-dark); transform: scale(1.05); }
+  .send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .send-btn svg { width: 18px; height: 18px; fill: white; }
+
+  /* SUMMARY CARD */
+  .summary-card {
+    background: linear-gradient(135deg, #FFF8E1, #FFFDE7);
+    border: 1.5px solid var(--gold);
+    border-radius: 14px;
+    padding: 16px;
+    font-size: 13px;
+    animation: fadeSlideIn 0.4s ease forwards;
+    opacity: 0;
+  }
+
+  .summary-card h4 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--slate);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255,179,0,0.2);
+    color: var(--slate);
+  }
+
+  .summary-row:last-child { border-bottom: none; }
+  .summary-label { color: var(--text-muted); font-size: 12px; }
+  .summary-val { font-weight: 600; color: var(--text); font-size: 12px; }
+
+  /* CTA FINAL */
+  .cta-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--red-dark), var(--red));
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 12px;
+    letter-spacing: 0.3px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(211,47,47,0.35);
+  }
+
+  .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(211,47,47,0.4); }
+
+  /* FOOTER */
+  .chat-footer {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-muted);
+    padding: 8px 16px 10px;
+    background: white;
+    border-top: 1px solid var(--border);
+  }
+
+  .chat-footer span { color: var(--red); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="chat-widget">
+
+  <!-- HEADER -->
+  <div class="chat-header">
+    <div class="header-top">
+      <div class="bot-avatar">🏠</div>
+      <div class="header-info">
+        <div class="header-name">Maxie — Assistante RE/MAX</div>
+        <div class="header-status">
+          <div class="status-dot"></div>
+          En ligne maintenant · Répond en quelques secondes
+        </div>
+      </div>
+      <div class="remax-badge">RE/MAX</div>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+    <div class="progress-label" id="progressLabel">Démarrez votre projet</div>
+  </div>
+
+  <!-- MESSAGES -->
+  <div class="chat-messages" id="chatMessages"></div>
+
+  <!-- INPUT -->
+  <div class="chat-input-area">
+    <div class="input-row">
+      <input
+        type="text"
+        class="chat-input"
+        id="chatInput"
+        placeholder="Écrivez votre réponse…"
+        disabled
+        autocomplete="off"
+      />
+      <button class="send-btn" id="sendBtn" disabled onclick="handleSend()">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="chat-footer">
+    Propulsé par IA · <span>RE/MAX Québec</span> · Vos données sont protégées
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+// ÉTAT & DONNÉES
+// ============================================================
+const leads = {};
+let currentStep = 0;
+let awaitingFreeText = false;
+let freeTextKey = '';
+let conversationDone = false;
+
+// Étapes du flow de qualification
+const flow = [
+  {
+    id: 'welcome',
+    botMsg: "Bonjour ! 👋 Je suis **Maxie**, votre assistante immobilière RE/MAX. En 2 minutes, je vais personnaliser votre recherche et vous connecter avec le bon courtier. C'est parti ! 🏡",
+    type: 'options',
+    question: "Quel est votre projet ?",
+    key: 'projet',
+    options: ['🏠 Acheter une propriété', '💰 Vendre ma propriété', '🔄 Acheter ET vendre', '🔑 Location'],
+    progress: 10,
+    progressLabel: 'Étape 1 / 6 — Votre projet'
+  },
+  {
+    id: 'type',
+    type: 'options',
+    question: "Quel type de propriété vous intéresse ?",
+    key: 'type_propriete',
+    options: ['🏡 Maison unifamiliale', '🏢 Condo / Appartement', '🏘️ Multiplex (2-6 logements)', '🌳 Terrain', '🏗️ Neuf / Construction'],
+    progress: 28,
+    progressLabel: 'Étape 2 / 6 — Type de propriété'
+  },
+  {
+    id: 'region',
+    type: 'options',
+    question: "Dans quelle région cherchez-vous ?",
+    key: 'region',
+    options: ['🌆 Montréal / Laval', '🏙️ Québec (ville)', '🏞️ Rive-Sud / Rive-Nord', '🌿 Mauricie / Centre-du-Qc', '🗺️ Autre région'],
+    progress: 44,
+    progressLabel: 'Étape 3 / 6 — Région'
+  },
+  {
+    id: 'budget',
+    type: 'options',
+    question: "Quel est votre budget approximatif ?",
+    key: 'budget',
+    options: ['Moins de 300 000 $', '300 000 $ — 500 000 $', '500 000 $ — 800 000 $', '800 000 $ — 1,2M $', '1,2M $ et plus'],
+    progress: 60,
+    progressLabel: 'Étape 4 / 6 — Budget'
+  },
+  {
+    id: 'delai',
+    type: 'options',
+    question: "Dans quel délai souhaitez-vous conclure votre transaction ?",
+    key: 'delai',
+    options: ['⚡ Dès que possible (< 3 mois)', '📅 3 à 6 mois', '🗓️ 6 à 12 mois', '🔍 Je cherche encore'],
+    progress: 76,
+    progressLabel: 'Étape 5 / 6 — Délai'
+  },
+  {
+    id: 'contact',
+    type: 'freetext',
+    botMsg: "Parfait ! Pour qu'un courtier RE/MAX certifié vous contacte sous 24h, j'ai juste besoin de votre **prénom et numéro de téléphone**.",
+    question: null,
+    placeholder: "Ex : Jean-François, 514-555-1234",
+    key: 'contact',
+    progress: 90,
+    progressLabel: 'Étape 6 / 6 — Vos coordonnées'
+  }
+];
+
+// ============================================================
+// UTILITAIRES
+// ============================================================
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function boldMarkdown(text) {
+  return text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+}
+
+function scrollBottom() {
+  const msgs = document.getElementById('chatMessages');
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ============================================================
+// RENDU
+// ============================================================
+function addBotBubble(text) {
+  const msgs = document.getElementById('chatMessages');
+  const row = document.createElement('div');
+  row.className = 'msg-row bot';
+  row.innerHTML = `
+    <div class="msg-avatar-sm">🏠</div>
+    <div class="bubble bot">${boldMarkdown(text)}</div>
+  `;
+  msgs.appendChild(row);
+  scrollBottom();
+}
+
+function addUserBubble(text) {
+  const msgs = document.getElementById('chatMessages');
+  const row = document.createElement('div');
+  row.className = 'msg-row user';
+  row.innerHTML = `<div class="bubble user">${text}</div>`;
+  msgs.appendChild(row);
+  scrollBottom();
+}
+
+async function showTyping(durationMs = 1000) {
+  const msgs = document.getElementById('chatMessages');
+  const row = document.createElement('div');
+  row.className = 'msg-row bot';
+  row.id = 'typingRow';
+  row.innerHTML = `
+    <div class="msg-avatar-sm">🏠</div>
+    <div class="typing-indicator">
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+    </div>
+  `;
+  msgs.appendChild(row);
+  scrollBottom();
+  await sleep(durationMs);
+  row.remove();
+}
+
+function addOptions(options, delay = 0) {
+  const msgs = document.getElementById('chatMessages');
+  const wrap = document.createElement('div');
+  wrap.className = 'options-wrap';
+  options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = opt;
+    btn.style.animationDelay = `${delay + i * 80}ms`;
+    btn.onclick = () => handleOption(opt, wrap);
+    wrap.appendChild(btn);
+  });
+  msgs.appendChild(wrap);
+  scrollBottom();
+}
+
+function setProgress(pct, label) {
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = label;
+}
+
+// ============================================================
+// LOGIQUE DU FLOW
+// ============================================================
+async function handleOption(value, wrap) {
+  // Désactiver tous les boutons
+  wrap.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+  const step = flow[currentStep];
+  leads[step.key] = value;
+
+  // Bulle utilisateur
+  addUserBubble(value);
+
+  // Avancer
+  currentStep++;
+  await sleep(400);
+  await runStep();
+}
+
+async function handleSend() {
+  const input = document.getElementById('chatInput');
+  const val = input.value.trim();
+  if (!val || conversationDone) return;
+
+  input.value = '';
+  input.disabled = true;
+  document.getElementById('sendBtn').disabled = true;
+  awaitingFreeText = false;
+
+  addUserBubble(val);
+  leads[freeTextKey] = val;
+
+  currentStep++;
+  await sleep(400);
+  await runStep();
+}
+
+async function runStep() {
+  if (currentStep >= flow.length) {
+    await showSummary();
+    return;
+  }
+
+  const step = flow[currentStep];
+  setProgress(step.progress, step.progressLabel);
+
+  await showTyping(900);
+
+  if (step.botMsg) {
+    addBotBubble(step.botMsg);
+    await sleep(500);
+  }
+
+  if (step.type === 'options') {
+    if (step.question) {
+      await showTyping(700);
+      addBotBubble(step.question);
+      await sleep(300);
+    }
+    addOptions(step.options, 100);
+  } else if (step.type === 'freetext') {
+    const input = document.getElementById('chatInput');
+    const btn = document.getElementById('sendBtn');
+    input.placeholder = step.placeholder || 'Votre réponse…';
+    input.disabled = false;
+    btn.disabled = false;
+    input.focus();
+    awaitingFreeText = true;
+    freeTextKey = step.key;
+  }
+}
+
+async function showSummary() {
+  conversationDone = true;
+  setProgress(100, '✅ Profil complété !');
+
+  await showTyping(1200);
+  addBotBubble("Excellent ! 🎉 Voici le résumé de votre projet. Un courtier RE/MAX certifié va vous appeler dans les **24 heures** !");
+
+  await sleep(600);
+
+  const msgs = document.getElementById('chatMessages');
+
+  // Carte résumé
+  const card = document.createElement('div');
+  card.style.padding = '0 4px';
+  card.innerHTML = `
+    <div class="summary-card">
+      <h4>📋 Votre dossier RE/MAX</h4>
+      <div class="summary-row">
+        <span class="summary-label">Projet</span>
+        <span class="summary-val">${leads.projet || '—'}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Type</span>
+        <span class="summary-val">${leads.type_propriete || '—'}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Région</span>
+        <span class="summary-val">${leads.region || '—'}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Budget</span>
+        <span class="summary-val">${leads.budget || '—'}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Délai</span>
+        <span class="summary-val">${leads.delai || '—'}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Contact</span>
+        <span class="summary-val">${leads.contact || '—'}</span>
+      </div>
+      <button class="cta-btn" onclick="finalCTA()">
+        📞 Confirmer — Je veux être contacté(e)
+      </button>
+    </div>
+  `;
+  msgs.appendChild(card);
+  scrollBottom();
+
+  // Désactiver l'input
+  document.getElementById('chatInput').disabled = true;
+  document.getElementById('chatInput').placeholder = 'Conversation terminée';
+  document.getElementById('sendBtn').disabled = true;
+}
+
+async function finalCTA() {
+  const msgs = document.getElementById('chatMessages');
+  const btns = msgs.querySelectorAll('.cta-btn');
+  btns.forEach(b => { b.disabled = true; b.textContent = '✅ Demande envoyée !'; b.style.background = '#388E3C'; });
+
+  await sleep(300);
+  await showTyping(1000);
+  addBotBubble("Parfait, **" + (leads.contact?.split(',')[0] || 'ami(e)') + "** ! 🏆 Votre dossier a été transmis à notre équipe RE/MAX. Un courtier certifié vous contactera **sous 24h**. En attendant, n'hésitez pas à explorer nos propriétés sur **remax-quebec.com** ! 🏡");
+  scrollBottom();
+}
+
+// Entrée clavier
+document.getElementById('chatInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    if (awaitingFreeText) handleSend();
+  }
+});
+
+// ============================================================
+// DÉMARRAGE
+// ============================================================
+async function startChat() {
+  await sleep(600);
+  setProgress(10, 'Démarrez votre projet');
+
+  const step = flow[0];
+  await showTyping(1200);
+  addBotBubble(step.botMsg);
+  await sleep(600);
+  await showTyping(800);
+  addBotBubble(step.question);
+  await sleep(300);
+  addOptions(step.options, 200);
+}
+
+startChat();
+</script>
+</body>
+</html>
